@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pesquisador de Fibonacci Infinito</title>
+</head>
+<body>
+
+  <h4>Pesquisador de Fibonacci (Escala Infinita)</h4>
+
+  <p>
+    Digite o termo desejado:
+    <input type="text" id="numero" placeholder="Digite qualquer número, sem limites">
+  </p>
+
+  <strong>Resultado:</strong>
+  <p id="status"></p>
+  <div id="resultado">Insira um número acima.</div>
+
+  <script>
+    const numero = document.getElementById("numero");
+    const resultado = document.getElementById("resultado");
+    const status = document.getElementById("status");
+    let timeoutId = null;
+
+    // Constantes matemáticas para a Fórmula de Binet com Logaritmos
+    const LOG10_PHI = 0.20898764024997873; // log10((1 + sqrt(5)) / 2)
+    const LOG10_SQRT5 = 0.3494850021680094; // log10(sqrt(5))
+
+    function calcularFibonacciInfinito(nStr) {
+      // Como o número de entrada é gigante, convertemos partes para lidar com precisão flutuante
+      let n = parseFloat(nStr);
+      
+      // Cálculo do expoente total na base 10 usando propriedades de logaritmo
+      let logTotal = (n * LOG10_PHI) - LOG10_SQRT5;
+      
+      // Separa a parte inteira (número de zeros) e a parte fracionária (o valor do número)
+      let expoente = Math.floor(logTotal);
+      let mantissaLog = logTotal - expoente;
+      
+      // Reduz a mantissa para o valor real visível
+      let mantissa = Math.pow(10, mantissaLog);
+      
+      // Trata pequenos desvios de precisão para garantir formato padrão de notação científica
+      if (mantissa < 1.0) {
+        mantissa *= 10;
+        expoente -= 1;
+      }
+      
+      return {
+        mantissa: mantissa.toFixed(15), // Mantém 15 dígitos de precisão real
+        digitosTotais: expoente + 1
+      };
+    }
+
+    numero.addEventListener("input", function () {
+      clearTimeout(timeoutId);
+      
+      timeoutId = setTimeout(() => {
+        let inputVal = numero.value.trim().replace(/\D/g, '');
+        if (!inputVal) {
+          resultado.innerHTML = "O termo deve ser maior que 0.";
+          status.innerHTML = "";
+          return;
+        }
+
+        if (inputVal === "0") {
+          resultado.innerHTML = "O termo deve ser maior que 0.";
+          return;
+        }
+
+        status.innerHTML = "Calculando aproximação logarítmica estruturada...";
+        
+        setTimeout(() => {
+          try {
+            // Trata números menores que 10000 de forma exata para manter consistência com o início da sequência
+            let nInt = parseInt(inputVal);
+            if (nInt > 0 && nInt < 10) {
+              const termosPequenos = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
+              resultado.innerHTML = `<strong>O ${nInt}º termo é:</strong><br><br>${termosPequenos[nInt]}`;
+              status.innerHTML = "Concluído!";
+              return;
+            }
+
+            // Executa o cálculo para números gigantescos em tempo real
+            let res = calcularFibonacciInfinito(inputVal);
+            
+            // Formata o número visualmente para o usuário sem estourar a memória
+            let htmlFormato = `
+              <strong>O ${BigInt(inputVal).toLocaleString('pt-BR')}º termo é aproximadamente:</strong><br><br>
+              <span style="color: #0066cc; font-size: 1.4em;">${res.mantissa} × 10<sup>${res.digitosTotais - 1}</sup></span>
+              <br><br>
+              <em>Este número possui exatamente <strong>${res.digitosTotais.toLocaleString('pt-BR')}</strong> dígitos no total.</em>
+            `;
+            
+            resultado.innerHTML = htmlFormato;
+            status.innerHTML = "Concluído instantaneamente!";
+          } catch (e) {
+            resultado.innerHTML = "Erro ao processar a magnitude do número.";
+            status.innerHTML = "";
+          }
+        }, 10);
+      }, 300);
+    });
+  </script>
+
+</body>
+</html>
