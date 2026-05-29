@@ -74,12 +74,3 @@ O projeto é composto por um único arquivo HTML contendo:
 * Fórmula de Binet
 * Logaritmos e notação científica
 * Propriedades do número áureo (φ)
-
----
-
-## 🛠️ Possíveis melhorias
-
-* Separar JS em arquivo externo
-* Adicionar gráficos de crescimento da sequência
-* Criar versão com Web Worker para cálculos paralelos
-* Suporte a precisão arbitrária (BigInt + bibliotecas matemáticas)
